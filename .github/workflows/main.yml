@@ -40,4 +40,22 @@ jobs:
           tags: |
             marcuspinto/kube-news:latest
             marcuspinto/kube-news:${{github.run_number}}
-  
+  CD:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - name: Kubernetes Set Context
+        uses: Azure/k8s-set-context@v2
+        with:
+          method: kubeconfig
+          kubeconfig: ${{secrets.K8S_CONFIG}}
+          
+      - name: Deploy to Kubernetes cluster
+        uses: Azure/k8s-deploy@v3.1
+        with:
+          images: marcuspinto/kube-news:${{github.run_number}}
+          manifests: |
+            k8s/deployment.yaml
